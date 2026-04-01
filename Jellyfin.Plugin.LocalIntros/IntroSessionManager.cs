@@ -30,6 +30,7 @@ public class IntroSessionManager : IHostedService, IDisposable
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
+        _logger.LogInformation("ForceIntros: IntroSessionManager is starting and hooking into PlaybackStart.");
         _sessionManager.PlaybackStart += OnPlaybackStart;
         return Task.CompletedTask;
     }
@@ -49,25 +50,42 @@ public class IntroSessionManager : IHostedService, IDisposable
     {
         try
         {
+            _logger.LogInformation("ForceIntros: PlaybackStart event triggered!");
+
             if (!LocalIntrosPlugin.Instance.Configuration.ForceIntros)
+            {
+                _logger.LogInformation("ForceIntros: Skipping because 'Force Intros' is disabled in configuration.");
                 return;
+            }
 
             if (e.Item == null || e.Session == null)
+            {
+                _logger.LogInformation("ForceIntros: Skipping because Item or Session is null.");
                 return;
+            }
 
             var kind = e.Item.GetBaseItemKind();
+            _logger.LogInformation("ForceIntros: Item Kind is {Kind} for {ItemName}", kind, e.Item.Name);
+
             if (kind != Jellyfin.Data.Enums.BaseItemKind.Movie && kind != Jellyfin.Data.Enums.BaseItemKind.Episode)
                 return;
 
             var localPath = LocalIntrosPlugin.Instance.Configuration.Local;
             if (!string.IsNullOrEmpty(localPath) && e.Item.Path != null && e.Item.Path.StartsWith(localPath, StringComparison.OrdinalIgnoreCase))
+            {
+                _logger.LogInformation("ForceIntros: Skipping because this item is physically located in the intro directory.");
                 return;
+            }
 
             if (e.Item.ProviderIds.ContainsKey("prerolls.video"))
+            {
+                _logger.LogInformation("ForceIntros: Skipping because this item possesses the prerolls.video provider ID.");
                 return;
+            }
 
             if (_sessionLastPlayedItemIds.TryGetValue(e.Session.Id, out var lastPlayedId) && lastPlayedId == e.Item.Id)
             {
+                _logger.LogInformation("ForceIntros: Skipping because we just forced this exact item to play!");
                 return;
             }
 
