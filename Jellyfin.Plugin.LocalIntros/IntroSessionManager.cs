@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 using Jellyfin.Plugin.LocalIntros.Configuration;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Library;
-using MediaBrowser.Controller.Plugins;
 using MediaBrowser.Controller.Session;
 using MediaBrowser.Model.Session;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Hosting;
 
 namespace Jellyfin.Plugin.LocalIntros;
 
-public class IntroSessionManager : IServerEntryPoint
+public class IntroSessionManager : IHostedService, IDisposable
 {
     private readonly ISessionManager _sessionManager;
     private readonly ILogger<IntroSessionManager> _logger;
@@ -28,9 +28,15 @@ public class IntroSessionManager : IServerEntryPoint
         _introProvider = new IntroProvider(loggerFactory);
     }
 
-    public Task RunAsync()
+    public Task StartAsync(CancellationToken cancellationToken)
     {
         _sessionManager.PlaybackStart += OnPlaybackStart;
+        return Task.CompletedTask;
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        _sessionManager.PlaybackStart -= OnPlaybackStart;
         return Task.CompletedTask;
     }
 
