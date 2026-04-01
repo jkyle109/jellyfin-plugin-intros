@@ -5,6 +5,7 @@
     <RootNamespace>Jellyfin.Plugin.LocalIntros</RootNamespace>
     <AssemblyVersion>2.2.0.100</AssemblyVersion>
     <FileVersion>2.2.0.100</FileVersion>
+    <AssemblyName>Jellyfin.Plugin.ForceIntros</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

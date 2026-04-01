@@ -1,0 +1,50 @@
+name: Release Plugin
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Build Plugin
+        run: |
+          dotnet build Jellyfin.Plugin.LocalIntros/Jellyfin.Plugin.LocalIntros.csproj -c Release
+
+      - name: Package Plugin
+        run: |
+          cd Jellyfin.Plugin.LocalIntros/bin/Release/net9.0/
+          zip Jellyfin.Plugin.ForceIntros.zip Jellyfin.Plugin.ForceIntros.dll
+
+      - name: Calculate MD5 Checksum
+        id: calc_md5
+        run: |
+          cd Jellyfin.Plugin.LocalIntros/bin/Release/net9.0/
+          echo "MD5=$(md5sum Jellyfin.Plugin.ForceIntros.zip | cut -d ' ' -f 1)" >> $GITHUB_ENV
+
+      - name: Generate manifest.json
+        run: |
+          chmod +x .github/scripts/generate-manifest.sh
+          ./.github/scripts/generate-manifest.sh "${{ github.ref_name }}" "${{ env.MD5 }}" "${{ github.repository }}" "${{ github.repository_owner }}"
+
+      - name: Create Release & Upload Assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Automatically create the GitHub release (creates a draft if one exists, otherwise a public release)
+          gh release create "${{ github.ref_name }}" --title "Release ${{ github.ref_name }}" --generate-notes || echo "Release already exists"
+
+          # Upload generated zip and manifest into the release
+          gh release upload "${{ github.ref_name }}" Jellyfin.Plugin.LocalIntros/bin/Release/net9.0/Jellyfin.Plugin.ForceIntros.zip manifest.json --clobber
