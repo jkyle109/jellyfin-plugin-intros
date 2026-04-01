@@ -31,9 +31,9 @@ public class IntroProvider : IIntroProvider
         try
         {
 
-            if (LocalIntrosPlugin.Instance.Configuration.ForceIntros)
+            if (LocalIntrosPlugin.Instance.Configuration.ForceIntros && item.GetBaseItemKind() != Data.Enums.BaseItemKind.Movie)
             {
-                logger.LogTrace("Force Intros mode enabled. Skipping standard IntroProvider injection.");
+                logger.LogTrace("Force Intros mode enabled. Skipping standard IntroProvider injection for TV Episodes.");
                 return Task.FromResult(Enumerable.Empty<IntroInfo>());
             }
 

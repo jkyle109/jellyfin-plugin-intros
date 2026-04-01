@@ -67,7 +67,9 @@ public class IntroSessionManager : IHostedService, IDisposable
             var kind = e.Item.GetBaseItemKind();
             _logger.LogInformation("ForceIntros: Item Kind is {Kind} for {ItemName}", kind, e.Item.Name);
 
-            if (kind != Jellyfin.Data.Enums.BaseItemKind.Movie && kind != Jellyfin.Data.Enums.BaseItemKind.Episode)
+            // Movies are natively handled by the standard IntroProvider since they don't typically have binge-queues
+            // We only need to utilize the server-side ForceIntros override for continuous Episodes!
+            if (kind != Jellyfin.Data.Enums.BaseItemKind.Episode)
                 return;
 
             var localPath = LocalIntrosPlugin.Instance.Configuration.Local;
