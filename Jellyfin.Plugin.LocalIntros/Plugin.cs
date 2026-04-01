@@ -8,12 +8,13 @@ using MediaBrowser.Model.Plugins;
 using MediaBrowser.Model.Serialization;
 
 using MediaBrowser.Controller;
+using MediaBrowser.Controller;
 using MediaBrowser.Controller.Plugins;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Jellyfin.Plugin.LocalIntros
 {
-    public class LocalIntrosPlugin : BasePlugin<IntroPluginConfiguration>, IHasWebPages, IPluginServiceRegistrator
+    public class LocalIntrosPlugin : BasePlugin<IntroPluginConfiguration>, IHasWebPages
     {
         public override string Name => "Force Intros";
 
@@ -39,11 +40,6 @@ namespace Jellyfin.Plugin.LocalIntros
                 Name = Name,
                 EmbeddedResourcePath = GetType().Namespace + ".Configuration.config.html"
             };
-        }
-
-        public void RegisterServices(IServiceCollection serviceCollection, IServerApplicationHost applicationHost)
-        {
-            serviceCollection.AddHostedService<IntroSessionManager>();
         }
     }
 }

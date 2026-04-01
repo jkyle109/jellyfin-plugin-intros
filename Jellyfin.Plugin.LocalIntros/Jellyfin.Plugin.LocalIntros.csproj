@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <RootNamespace>Jellyfin.Plugin.LocalIntros</RootNamespace>
-    <AssemblyVersion>2.2.0.100</AssemblyVersion>
-    <FileVersion>2.2.0.100</FileVersion>
+    <AssemblyVersion>1.0.6.0</AssemblyVersion>
+    <FileVersion>1.0.6.0</FileVersion>
     <AssemblyName>Jellyfin.Plugin.ForceIntros</AssemblyName>
   </PropertyGroup>
 
