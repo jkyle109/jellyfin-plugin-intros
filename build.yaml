@@ -1,5 +1,5 @@
-name: 'Local Intros'
-guid: '07d86795-01f2-4d22-b174-cdc6056c3e7c'
+name: 'Force Intros'
+guid: 'B6FB4817-524D-4AD0-A067-8A66260FD432'
 version: 4
 targetAbi: '10.11.0.0'
 framework: 'net9.0'
@@ -10,7 +10,7 @@ description: >
 
 category: 'MoviesAndShows'
 artifacts:
-  - 'Jellyfin.Plugin.LocalIntros.dll'
+  - 'Jellyfin.Plugin.ForceIntros.dll'
 changelog: |-
   - Jellyfin 10.11 support (#51) @crobibero
   - Update README.md (#41) @lukasitaly

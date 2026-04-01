@@ -24,12 +24,18 @@ public class IntroProvider : IIntroProvider
         logger = loggerFactory.CreateLogger<IntroProvider>();
     }
 
-    public string Name { get; } = "Intros";
+    public string Name { get; } = "Force Intros";
 
     public Task<IEnumerable<IntroInfo>> GetIntros(BaseItem item, User user)
     {
         try
         {
+
+            if (LocalIntrosPlugin.Instance.Configuration.ForceIntros)
+            {
+                logger.LogTrace("Force Intros mode enabled. Skipping standard IntroProvider injection.");
+                return Task.FromResult(Enumerable.Empty<IntroInfo>());
+            }
 
             if (LocalIntrosPlugin.Instance.Configuration.Local != string.Empty)
             {
@@ -68,19 +74,34 @@ public class IntroProvider : IIntroProvider
                 var episode = item as Episode;
                 var season = episode.Season;
                 var series = episode.Series;
+
+                var tags = episode.Tags ?? Array.Empty<string>();
+                if (season?.Tags != null) tags = tags.Concat(season.Tags).ToArray();
+                if (series?.Tags != null) tags = tags.Concat(series.Tags).ToArray();
+
+                var genres = episode.Genres ?? Array.Empty<string>();
+                if (season?.Genres != null) genres = genres.Concat(season.Genres).ToArray();
+                if (series?.Genres != null) genres = genres.Concat(series.Genres).ToArray();
+
+                var studios = episode.Studios ?? Array.Empty<string>();
+                if (season?.Studios != null) studios = studios.Concat(season.Studios).ToArray();
+                if (series?.Studios != null) studios = studios.Concat(series.Studios).ToArray();
+
+                var premiereDate = episode.PremiereDate ?? season?.PremiereDate ?? series?.PremiereDate ?? DateTime.Today;
+
                 return (
-                    episode.Tags.Concat(season.Tags).Concat(series.Tags).ToHashSet(),
-                    episode.Genres.Concat(season.Genres).Concat(series.Genres).ToHashSet(),
-                    episode.Studios.Concat(season.Studios).Concat(series.Studios).ToHashSet(),
+                    tags.ToHashSet(),
+                    genres.ToHashSet(),
+                    studios.ToHashSet(),
                     DateTime.Now,
-                    episode.PremiereDate ?? season.PremiereDate ?? series.PremiereDate ?? DateTime.Today
+                    premiereDate
                 );
         }
         var emp = new HashSet<string>();
         return (emp,emp,emp, DateTime.Now, DateTime.Today);
     }
 
-    private IEnumerable<IntroInfo> Local(BaseItem item)
+    public IEnumerable<IntroInfo> Local(BaseItem item)
     {
         if (LocalIntrosPlugin.Instance.Configuration.IntrosForMoviesOnly && item.GetBaseItemKind() != Data.Enums.BaseItemKind.Movie)
             return Enumerable.Empty<IntroInfo>();

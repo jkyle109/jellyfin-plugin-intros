@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>Intros</title>
+    <title>Force Intros</title>
 </head>
 <body>
     <div id="configPage" data-role="page" class="page type-interior pluginPage" data-require="emby-input,emby-button,emby-select,emby-checkbox">
@@ -16,6 +16,13 @@
                             <input id="introsForMoviesOnly" type="checkbox" is="emby-checkbox" />
                             <span>Only show intros for movies</span>
                         </label>
+                    </div>
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label class="emby-checkbox-label">
+                            <input id="forceIntros" type="checkbox" is="emby-checkbox" />
+                            <span>Force Intros before every episode (Override Client)</span>
+                        </label>
+                        <div class="fieldDescription" style="color: #ffcccc;">WARNING: This uses a server-side hack to inject intros. It works by sending a PlayNow command to the client, which will destroy the active 'Up Next' playback queue and cause auto-play to break.</div>
                     </div>
                     <div class="inputContainer">
                         <label class="inputLabel inputLabelUnfocused" for="local">Local Source</label>
@@ -153,7 +160,7 @@
         <script type="text/javascript">
             (() => {
                 var plugin = {
-                    guid: '07d86795-01f2-4d22-b174-cdc6056c3e7c'
+                    guid: 'B6FB4817-524D-4AD0-A067-8A66260FD432'
                 };
                 
                 var cleanDate = str => str.split('T')[0];
@@ -165,7 +172,8 @@
                     TagIntros: [], 
                     GenreIntros: [],
                     StudioIntros: [],
-                    IntrosForMoviesOnly: false
+                    IntrosForMoviesOnly: false,
+                    ForceIntros: false
                 };
 
                 var loadPage = () => {
@@ -183,6 +191,7 @@
                         localIntroConfig = config;
 
                         document.querySelector('#introsForMoviesOnly').checked = localIntroConfig.IntrosForMoviesOnly;
+                        document.querySelector('#forceIntros').checked = localIntroConfig.ForceIntros;
 
                         $('#local').val(config.Local);
                         
@@ -457,6 +466,7 @@
 
                 document.querySelector('#configForm').addEventListener('submit', function (event) {
                     localIntroConfig.IntrosForMoviesOnly = document.querySelector('#introsForMoviesOnly').checked;
+                    localIntroConfig.ForceIntros = document.querySelector('#forceIntros').checked;
 
                     Dashboard.showLoadingMsg();
 
