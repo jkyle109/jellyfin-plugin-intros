@@ -233,13 +233,29 @@
                 var loadVideos = () => {
                     let url = ApiClient.getUrl('LocalIntros/LoadIntros');
                     let data = {};
-                    ApiClient.ajax({ type: 'POST', url, data, contentType: 'application/json' }).then(() => {loadPage()}).catch(ev => alert(ev));
+                    ApiClient.ajax({ type: 'POST', url, data, contentType: 'application/json' }).then(() => {loadPage()}).catch(async ev => {
+                        let errMsg = "[object Response]";
+                        if (ev && typeof ev.text === 'function') {
+                            errMsg = await ev.text();
+                        } else if (ev && ev.message) {
+                            errMsg = ev.message;
+                        }
+                        alert("Error: " + errMsg);
+                    });
                 }
 
                 var clearIntros = () => {
                     let url = ApiClient.getUrl('LocalIntros/ClearIntros');
                     let data = {};
-                    ApiClient.ajax({ type: 'POST', url, data, contentType: 'application/json' }).then(() => {loadPage()}).catch(ev => alert(ev));
+                    ApiClient.ajax({ type: 'POST', url, data, contentType: 'application/json' }).then(() => {loadPage()}).catch(async ev => {
+                        let errMsg = "[object Response]";
+                        if (ev && typeof ev.text === 'function') {
+                            errMsg = await ev.text();
+                        } else if (ev && ev.message) {
+                            errMsg = ev.message;
+                        }
+                        alert("Error: " + errMsg);
+                    });
                 }
 
                 var addTagIntroRule = (introId, precedence, prevalence) => 

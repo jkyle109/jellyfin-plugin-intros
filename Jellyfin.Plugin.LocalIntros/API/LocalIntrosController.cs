@@ -51,9 +51,17 @@ public class LocalIntrosController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public IActionResult LoadIntros()
     {
-        logger.LogDebug("Loading Intros");
-        PopulateIntroLibrary();
-        return Ok();
+        try
+        {
+            logger.LogDebug("Loading Intros");
+            PopulateIntroLibrary();
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error loading intros");
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpPost("ClearIntros")]
@@ -81,7 +89,16 @@ public class LocalIntrosController : ControllerBase
 
     private Dictionary<Guid, BaseItem> PopulateIntroLibrary()
     {
-        logger.LogTrace($"Retrieving attributes of {introsPath}");
+        if (string.IsNullOrWhiteSpace(introsPath))
+        {
+            throw new ArgumentException("Please configure a valid Local Source directory before loading videos.");
+        }
+
+        if (!System.IO.Directory.Exists(introsPath) && !System.IO.File.Exists(introsPath))
+        {
+            throw new DirectoryNotFoundException($"Directory or File Not Found: {introsPath}. Please verify your network path and permissions.");
+        }
+
         var attrs = System.IO.File.GetAttributes(introsPath);
 
         bool needsConfigUpdate = false;
