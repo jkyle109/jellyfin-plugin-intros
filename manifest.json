@@ -1,0 +1,11 @@
+[
+  {
+    "category": "MoviesAndShows",
+    "guid": "B6FB4817-524D-4AD0-A067-8A66260FD432",
+    "name": "Force Intros",
+    "description": "Select a flashy pre-roll from local storage to run before any video content.",
+    "owner": "jkyle109",
+    "overview": "A modified intros plugin that forcibly overrides the client to play intros before binge-watched episodes.",
+    "versions": []
+  }
+]

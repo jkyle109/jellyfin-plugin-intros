@@ -98,10 +98,36 @@ public class IntroSessionManager : IHostedService, IDisposable
                 
                 _sessionLastPlayedItemIds[e.Session.Id] = e.Item.Id;
 
+                var newQueue = new System.Collections.Generic.List<Guid> { introInfo.ItemId.Value };
+                bool foundCurrent = false;
+
+                if (e.Session.NowPlayingQueue != null)
+                {
+                    foreach (var queuedItem in e.Session.NowPlayingQueue)
+                    {
+                        if (queuedItem.Id == e.Item.Id)
+                        {
+                            foundCurrent = true;
+                        }
+
+                        if (foundCurrent)
+                        {
+                            newQueue.Add(queuedItem.Id);
+                        }
+                    }
+                }
+
+                if (!foundCurrent)
+                {
+                    newQueue.Add(e.Item.Id);
+                }
+
+                _logger.LogInformation("ForceIntros: Reconstructed queue length: {Length} items.", newQueue.Count);
+
                 var playRequest = new PlayRequest
                 {
                     PlayCommand = PlayCommand.PlayNow,
-                    ItemIds = new Guid[] { introInfo.ItemId.Value, e.Item.Id },
+                    ItemIds = newQueue.ToArray(),
                     ControllingUserId = e.Session.UserId
                 };
 
